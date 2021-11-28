@@ -1,141 +1,142 @@
-import tkinter.messagebox
-from tkinter import *
-import tkinter.scrolledtext as scrolledtext
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+import time
+import sys
+import articles
 
 import pygame.mixer
-
-import articles
 
 global paused
 paused = False
 
 
-# Pause and Unpause The Current Song
-def pause(is_paused):
-    global paused
-    paused = is_paused
 
-    if paused:
-        # Unpause
-        pygame.mixer.music.unpause()
-        paused = False
-    else:
-        # Pause
-        pygame.mixer.music.pause()
-        paused = True
+class ScrollLabel(QScrollArea):
 
+    
 
-def select_article(event):
-    cs = event.widget.curselection()[0]
-    if cs:
-        index = cs
-        data = event.widget.get(index)
-        article_app(cs)
+    def __init__(self, *args, **kwargs):
+        QScrollArea.__init__(self, *args, **kwargs)
+        self.setWidgetResizable(True)
+        content = QWidget(self)
+        self.setWidget(content)
+        lay = QVBoxLayout(content)
+        self.label = QLabel(content)
+        self.font = self.label.font()
+        self.font.setFamily("Franklin Gothic Medium")
+        self.font.setPointSize(12)
+        self.label.setFont(self.font)
+        self.label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+        self.label.setWordWrap(True)
+        lay.addWidget(self.label)
+    def setText(self, text):
+        self.label.setText(text)
+ 
 
-    else:
-        pass
+class AnotherWindow(QWidget):
+    
 
+    def __init__(self, index):
+        
+        super().__init__()
+        layout = QGridLayout()
+        self.setGeometry(300, 150, 1280, 720)
+        self.setWindowTitle("Article Reader")
+        self.converter = QPushButton("Convert", self)
+        self.converter.clicked.connect(lambda : self.convert(index))
+        self.converter.setGeometry(150,50, 50, 20)
+        self.play = QPushButton("Play", self)
+        self.play.clicked.connect(lambda : articles.stream(index))
+        self.play.setGeometry(150,50, 50, 20)
+        self.stop = QPushButton("Stop", self)
+        self.stop.clicked.connect(lambda: self.pause(paused))
+        self.stop.setGeometry(150,50, 50, 20)
+        self.loading = QProgressBar(self)
+        self.loading.setGeometry(30, 40, 200, 25)
+        self.text1 = QLabel(f"{articles.get_article_title_by_index(index)}")
+        self.font = self.text1.font()
+        self.content = ScrollLabel(self)
+        self.content.setText(articles.get_article_text_by_index(index))
+        self.content.setGeometry(150,100,1000,600)
+        self.font.setFamily("Bahnschrift")
+        self.font.setPointSize(15)
+        self.text1.setFont(self.font)
+        self.text1.setAlignment(Qt.AlignHCenter)
+        layout.addWidget(self.text1, 0, 0, 1, 3)
+        layout.addWidget(self.play, 2, 1)
+        layout.addWidget(self.stop, 2, 2)
+        layout.addWidget(self.converter, 2, 0)
+        layout.addWidget(self.loading, 3, 0, 1, 3)
+        layout.addWidget(self.content, 4, 0, 1, 3)
+        self.setLayout(layout)
 
-def wait_file(index):
-    if articles.stream(index) is not False:
-        return True
-    else:
-        return tkinter.messagebox.showinfo('Wait', 'The file still being generated!!')
+    def convert(self, index):
+        lambda: articles.hear_article(articles.get_article_text_by_index(index),
+                                                           str(index))
+        for i in range(101):
+            time.sleep(0.7)
+            self.loading.setValue(i)
+        return None
 
+    def pause(self, is_paused):
+        global paused
+        paused = is_paused
 
-def wait_file1(index):
-    if articles.play_article(index) is not False:
-        return True
-    else:
-        return tkinter.messagebox.showinfo('Wait', 'The file still being generated!!')
+        if paused:
+            # Unpause
+            pygame.mixer.music.unpause()
+            paused = False
+        else:
+            # Pause
+            pygame.mixer.music.pause()
+            paused = True
+    
+    
+class Window(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.app = None
+        layout = QVBoxLayout()
+        self.listwidget = QListWidget(self)
+        self.font = self.listwidget.font()
+        self.font.setFamily("Franklin Gothic Medium")
+        self.font.setPointSize(12)
+        self.listwidget.insertItems(0, articles.get_all_articles_title())
+        self.listwidget.setGeometry(150,150,1000,500)
+        self.listwidget.verticalScrollBar()
+        self.listwidget.itemDoubleClicked.connect(lambda: self.openned_article(int(self.listwidget.currentRow())))
+        self.listwidget.setFont(self.font)
+        self.text1 = QLabel("Welcome to Article Reader!", self)
+        self.text2 = QLabel("You can choose one of the above articles and generate an mp3 audio with its content.", self)
+        self.font1 = self.text1.font()
+        self.font1.setFamily("Bahnschrift")
+        self.font1.setPointSize(25)
+        self.text1.setFont(self.font1)
+        self.font2 = self.text2.font()
+        self.font2.setFamily("Bahnschrift")
+        self.font2.setPointSize(15)
+        self.text2.setFont(self.font2)
+        self.text1.setStyleSheet("border: 0px solid black;")
+        self.text1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.text1.setAlignment(Qt.AlignHCenter)
+        self.text1.move(440, 55)
+        self.text2.move(340, 105)
+        self.text1.adjustSize()
+        self.text2.adjustSize()
+        layout.addWidget(self.text1)
+        layout.addWidget(self.text2)
+        layout.addWidget(self.listwidget)
+        self.setLayout(layout)
+        self.setGeometry(300, 150, 1280, 720)
+        self.setWindowTitle("Article Reader")
+        self.show()
+    
+    def openned_article(self, index):
+        self.app = AnotherWindow(index)
+        self.app.show()
 
-
-def main_app():
-    title_Font = ('Times New Roman', 20, 'bold')
-    default_Font = ('Times New Roman', 15, 'normal')
-    window = Tk()
-    window.geometry('1280x1000')
-    window.title('Article reader')
-    window.resizable(False, False)
-
-    frame = Frame(window, width=1280, height=720)
-    frame.grid(column=0, row=1)
-    frame.grid_propagate(0)
-    frame.update()
-
-    frame1 = Frame(window, width=1280, height=120)
-    frame1.grid(column=0, row=0)
-    text1 = Label(frame1, text='Welcome to the A.R. (Article Reader)')
-    text1.place(x=425, y=10)
-    text1.config(font=title_Font)
-
-    text2 = Label(frame1, text='Choose an article above to read:')
-    text2.place(x=500, y=60)
-    text2.config(font=default_Font)
-
-    scrollbar = Scrollbar(frame)
-
-    listbox = Listbox(frame, height=50, width=190)
-    listbox.config(yscrollcommand=scrollbar.set)
-    listbox.pack(side=LEFT, fill=BOTH)
-    scrollbar.pack(side=RIGHT, fill=BOTH)
-    scrollbar.config(command=listbox.yview)
-
-    for i in articles.get_all_articles_title():
-        listbox.insert(END, i)
-
-    listbox.bind('<Double-1>', select_article)
-    window.mainloop()
-
-
-def article_app(index):
-    pygame.mixer.init()
-    title_Font = ('Times New Roman', 15, 'bold')
-    default_Font = ('Times New Roman', 13, 'bold')
-    button_Font = ('Times New Roman', 10, 'bold')
-    window = Tk()
-    window.geometry('1280x1000')
-    window.title(articles.get_article_title_by_index(index))
-    window.resizable(False, False)
-
-    frame = Frame(window, width=1280, height=720)
-    frame.place(x=100, y=120)
-    frame1 = Frame(window, width=1280, height=120)
-    frame1.grid(column=0, row=0)
-
-    text1 = Label(frame1, text=articles.get_article_title_by_index(index))
-    text1.place(x=100, y=10)
-    text1.config(font=title_Font)
-
-    text2 = Label(frame1, text='Wanna hear it?')
-    text2.place(x=100, y=70)
-    text2.config(font=default_Font)
-
-    button1 = Button(frame1, text='Convert to mp3',
-                     command=lambda: articles.hear_article(articles.get_article_text_by_index(index),
-                                                           str(index)))
-    button1.config(width=11, height=1, background='grey', font=button_Font)
-    button1.place(x=230, y=70)
-
-
-    button3 = Button(frame1, text='Play',
-                     command=lambda: wait_file(index))
-    button3.config(width=10, height=1, background='grey', font=button_Font)
-    button3.place(x=330, y=70)
-
-    button4 = Button(frame1, text='Stop',
-                     command=lambda: pause(paused))
-    button4.config(width=10, height=1, background='grey', font=button_Font)
-    button4.place(x=430, y=70)
-
-    txt = scrolledtext.ScrolledText(frame, undo=True)
-    txt.insert(END,
-               '\n' + articles.get_article_text_by_index(
-                   index))
-    txt['font'] = ('Times New Roman', '12')
-    txt.pack(side=TOP, expand=True, fill='both')
-    txt.config(height=40, width=120)
-    window.mainloop()
-
-
-main_app()
+ 
+app = QApplication(sys.argv)
+window = Window()
+sys.exit(app.exec_())

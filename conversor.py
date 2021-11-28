@@ -4,9 +4,9 @@ import sys
 import requests
 import pandas as pd
 
-aws_access_key_id = "ASIA5SZMNHBQP24ETYU3"
-aws_secret_access_key = "R8u/+X3LBPJX4I9POW+bXh2EBm66jHWFzhr1TK0D"
-aws_session_token = "FwoGZXIvYXdzEOD//////////wEaDD9nrfooHhY1iK4kqSLGAetNx6q0l2HqXpXN4mfiv7wv0nxskRwE8snU/JcgfNUeOsc5fi7eokHcl2uYvPVnjVDJydH9ggqhsfW3V6Cnm51XB3eWbsne3JlldNKN23r9dpkI3jEYcoIxXeyydosLK36Ny/fkDQb3zQ98xaEKxHi6fYHFKKezxxd2lfv/djfkw2yh9N5lgyOtgkLDZozV6FxD69Dy15IKdtRgqeqkG7+TFOC//IJP+2K1CX0jXO3BgKTIcpFE+L+DABxH9w6sfT2wxqtZ/Cjut4WNBjItl3VOjFCEYdV0g0prsnOyqRjooZlRsPlx5H3flW89I/cAjfSv1gZgHC4f7/gG"
+aws_access_key_id = "ASIA5SZMNHBQDSMEWIVN"
+aws_secret_access_key = "pyHEiwkqLjrjpBxDJpoSRxobEHsykL3zQgsEBm9r"
+aws_session_token = 'FwoGZXIvYXdzEA0aDAqZeq6qtUbOWxBytCLGAZhnWXIFte1t9/18QEA6Pwx9X907s0DNum+bd/3Z0OFT9+8U91Ck35BUOnZuIz2LMDGRD9OAdQCkLmZbb82bBiNyi3QnVOT28tEQSFBBp6wNSZeduhRrhyYyi4TR8nPkE83SKeOhV+OcQamS5jjtEYZf7m39wOG0M29sfxOLDuG8W3igBVOKVmo9A9wE437QV+vTH5CLFj0+IonxYxACqL0tLp3rmZ5J2aJ49wW7v2+VTqWqyo4xnTVvUOnx6uPEXQ/8d6H06CjvrY+NBjItA+Ff1mJgMNhqT7UkkOJkc5IBb3hKcbykN0FYbbVaWkBpaPUdu38o55hDzOne'
 session = boto3.Session(region_name='us-east-1',
                         aws_access_key_id=aws_access_key_id,
                         aws_secret_access_key=aws_secret_access_key,
