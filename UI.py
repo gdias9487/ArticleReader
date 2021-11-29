@@ -47,7 +47,7 @@ class AnotherWindow(QWidget):
         self.converter.clicked.connect(lambda : self.convert(index))
         self.converter.setGeometry(150,50, 50, 20)
         self.play = QPushButton("Play", self)
-        self.play.clicked.connect(lambda : articles.stream(index))
+        self.play.clicked.connect(lambda : articles.stream(articles.get_clean_article_title(articles.get_article_title_by_index(index))))
         self.play.setGeometry(150,50, 50, 20)
         self.stop = QPushButton("Stop", self)
         self.stop.clicked.connect(lambda: self.pause(paused))
@@ -72,8 +72,8 @@ class AnotherWindow(QWidget):
         self.setLayout(layout)
 
     def convert(self, index):
-        lambda: articles.hear_article(articles.get_article_text_by_index(index),
-                                                           str(index))
+        articles.hear_article(articles.get_article_text_by_index(index),
+                                                           articles.get_clean_article_title(articles.get_article_title_by_index(index)))
         for i in range(101):
             time.sleep(0.7)
             self.loading.setValue(i)

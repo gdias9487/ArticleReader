@@ -4,9 +4,9 @@ import sys
 import requests
 import pandas as pd
 
-aws_access_key_id = "ASIA5SZMNHBQDSMEWIVN"
-aws_secret_access_key = "pyHEiwkqLjrjpBxDJpoSRxobEHsykL3zQgsEBm9r"
-aws_session_token = 'FwoGZXIvYXdzEA0aDAqZeq6qtUbOWxBytCLGAZhnWXIFte1t9/18QEA6Pwx9X907s0DNum+bd/3Z0OFT9+8U91Ck35BUOnZuIz2LMDGRD9OAdQCkLmZbb82bBiNyi3QnVOT28tEQSFBBp6wNSZeduhRrhyYyi4TR8nPkE83SKeOhV+OcQamS5jjtEYZf7m39wOG0M29sfxOLDuG8W3igBVOKVmo9A9wE437QV+vTH5CLFj0+IonxYxACqL0tLp3rmZ5J2aJ49wW7v2+VTqWqyo4xnTVvUOnx6uPEXQ/8d6H06CjvrY+NBjItA+Ff1mJgMNhqT7UkkOJkc5IBb3hKcbykN0FYbbVaWkBpaPUdu38o55hDzOne'
+aws_access_key_id = "ASIA5SZMNHBQMXOYWEPK"
+aws_secret_access_key = "vo5tw51FmTh2zGCZLX/imYlAhMkjP81qsYQpdCd2"
+aws_session_token = 'FwoGZXIvYXdzEBoaDK/eCUkek8v4gQb4fiLGAcRmQcuhBintCB3cN4NI9eRMBuk7HBAFWhCjCAuWWb243Pc1rMTnOR+yPqqvXXQI2FjDbRzvg7fIjP2eSb79HpOUBlj19VMIgPy2CKfVH//Cem136t8Li9icD2LJ00EExIvOOeNZ66xNXn9wA50hl2eL+Sm9WUEC9n+xUrCXQKYucqXLXj0Tgp6oAZiw4mlsRo569GmhQB7hW/+6sThPp6uBi6LOJfRxAi+rh/L4tMl0+1Xm2m79Q0sZNrMpT3I+ntTAQRaEtSi1qJKNBjItNgdYNWqjEHub1Xdzl3TcpwaDbbimadbNz0UXYr5xItXllOe9egSRs4VJqVcv'
 session = boto3.Session(region_name='us-east-1',
                         aws_access_key_id=aws_access_key_id,
                         aws_secret_access_key=aws_secret_access_key,
@@ -51,10 +51,11 @@ def convert_to_speech(text, title):
         sys.exit(-1)
 
 
-def stream(index):
+def stream(title):
+    slc = len(title)
     my_bucket = S3.Bucket(name='articles-1')
     for i in my_bucket.objects.all():
-        if f'{index}' == i.key[:2]:
+        if f'{title}' == i.key[:slc]:
             
             return Stream(s3.generate_presigned_url(
                                 ClientMethod="get_object",
